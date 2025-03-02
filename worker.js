@@ -1,4 +1,4 @@
-const wo_list = "0123456789abcdefghijklmnopqrstuvwxyz".split("");
+const wo_list = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
 self.onmessage = function(e) {
   const { target, startLength } = e.data;
