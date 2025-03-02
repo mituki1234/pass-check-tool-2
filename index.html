@@ -4,7 +4,7 @@
     <title>パスワードチェック (並列処理版)</title>
   </head>
   <body>
-    <h2>パスワードチェック (1-6桁)</h2>
+    <h2>パスワードチェック (1-5桁)</h2>
     <input type="password" id="password" />
     <button id="start-btn">開始</button>
     <p id="password-check">待機中</p>
@@ -16,7 +16,7 @@
       let timeCheck = 0;
 
       document.getElementById("start-btn").onclick = function() {
-        if(document.getElementById("password").value.length > 6) {
+        if(document.getElementById("password").value.length > 5) {
           alert("パスワードは6桁以下にしてください");
           return;
         }
