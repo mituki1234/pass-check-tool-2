@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>パスワードチェック (並列処理版)</title>
+  </head>
+  <body>
+    <h2>パスワードチェック (1-6桁)</h2>
+    <input type="text" id="password" />
+    <button id="start-btn">開始</button>
+    <p id="password-check">待機中</p>
+    <p id="check-time">かかった時間</p>
+    <script>
+      const WORKER_COUNT = 4;
+      let workers = [];
+      let running = false;
+      let timeCheck = 0;
+
+      document.getElementById("start-btn").onclick = function() {
+        if(document.getElementById("password").value.length > 6) {
+          alert("パスワードは6桁以下にしてください");
+          return;
+        }
+        if(document.getElementById("password").value == "") {
+          alert("パスワードを入力してください");
+          return;
+        }
+        if (running) return;
+        running = true;
+
+
+        const target = document.getElementById("password").value;
+        const resultElement = document.getElementById("password-check");
+        timeCheck = Date.now();
+
+        for (let i = 0; i < WORKER_COUNT; i++) {
+          const worker = new Worker('worker.js');
+          workers.push(worker);
+
+          worker.onmessage = function(e) {
+            if (!running) return;
+
+            if (e.data.found) {
+              resultElement.textContent = "パスワード発見: " + e.data.password;
+              stopWorkers();
+              running = false;
+            } else {
+              resultElement.textContent = "探索中: " + e.data.current;
+            }
+
+            document.getElementById("check-time").innerHTML = 
+              "かかった時間:" + timeParse(Date.now() - timeCheck);
+          };
+
+          worker.postMessage({
+            target: target,
+            startLength: i + 1
+          });
+        }
+      };
+
+      function stopWorkers() {
+        workers.forEach(worker => worker.terminate());
+        workers = [];
+      }
+
+      function timeParse(e) {
+        if (e <= 60000) {
+          return Math.floor(e / 1000) + "秒";
+        }
+        return Math.floor(e / 60000) + "分" + Math.floor((e % 60000) / 1000) + "秒";
+      }
+    </script>
+  </body>
+</html>
